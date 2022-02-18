@@ -25,3 +25,7 @@ with LineTcpSender(HOST, PORT, SIZE) as ls:
         ls.at_now()
     ls.flush()
 ```
+
+To test:
+- Run echo.py first
+- Then run test.py
