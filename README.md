@@ -2,7 +2,11 @@
 
 ### Python QuestDB ILP TCP client
 
-- Basic usage
+To test:
+- Run echo.py first
+- Then run test.py
+
+Basic usage
 
 ```py
 with LineTcpSender(HOST, PORT, SIZE) as ls:
@@ -15,7 +19,7 @@ with LineTcpSender(HOST, PORT, SIZE) as ls:
     ls.flush()
 ```
 
-- Multi-line send
+Multi-line send
 
 ```py
 with LineTcpSender(HOST, PORT, SIZE) as ls:
@@ -25,7 +29,3 @@ with LineTcpSender(HOST, PORT, SIZE) as ls:
         ls.at_now()
     ls.flush()
 ```
-
-To test:
-- Run echo.py first
-- Then run test.py
