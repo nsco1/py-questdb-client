@@ -12,10 +12,10 @@ Basic usage
 with LineTcpSender(HOST, PORT, SIZE) as ls:
     ls.table("metric_name")
     ls.symbol("Symbol", "value")
-    ls.column("number", 10)
-    ls.column("double", 12.23)
-    ls.column("string", "born to shine")
-    ls.at(datetime(2021, 11, 25, 0, 46, 26))
+    ls.column_int("number", 10)
+    ls.column_float("double", 12.23)
+    ls.column_str("string", "born to shine")
+    ls.at_datetime(datetime(2021, 11, 25, 0, 46, 26))
     ls.flush()
 ```
 
@@ -25,7 +25,7 @@ Multi-line send
 with LineTcpSender(HOST, PORT, SIZE) as ls:
     for i in range(int(1e6)):
         ls.table("metric_name")
-        ls.column("counter", i)
+        ls.column_int("counter", i)
         ls.at_now()
     ls.flush()
 ```
