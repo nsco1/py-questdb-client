@@ -37,72 +37,50 @@ class LineTcpSender:
         sent = self._client_socket.send(self._send_buffer[:self._position])
         self._position -= sent
 
-    def _put(self, data):
-        if isinstance(data, str):
-            if (len(data) == 1):
-                if (self._position + 1 >= len(self._send_buffer)):
-                    self.flush()
-                self._send_buffer[self._position:self._position] = data.encode('utf-8')
-                self._position += 1
-            else:
-                for char in data:
-                    self._put(char)
-            return self
+    def _put_str(self, data: str):
+        encoded = data.encode('utf-8')
+        length = len(encoded)
 
-        elif isinstance(data, int):
-            if (data == -sys.maxsize - 1):
-                raise OverflowError
-
-            value = str(data).encode("utf-8")
-            length = len(value)
-
-            end_position = self._position + length
-            if (end_position >= len(self._send_buffer)):
-                self.flush()
-
-            self._send_buffer[self._position:end_position] = value
-            self._position += length
-            return self
-
-        else:
-            raise TypeError("Unsupported type")
-
-    def _put_special(self, char):
-        if (char == ' ' or char == ',' or char == '='):
-            if (not self._quoted):
-                self._put('\\')
-            self._put(char)
-        elif (char == '\n' or char == '\r'):
-            self._put('\\')._put(char)
-        elif (char == '"'):
-            if (self._quoted):
-                self._put('\\')
-            self._put(char)
-        elif (char == '\\'):
-            self._put('\\')._put('\\')
-        else:
-            self._put(char)
-
-    def _put_utf8(self, char):
-        if (self._position + 4 >= len(self._send_buffer)):
+        end_position = self._position + length
+        if (end_position >= len(self._send_buffer)):
             self.flush()
 
-        encoding = char.encode('utf8')
-        length = len(encoding)
-
-        self._send_buffer[self._position:self._position + length] = encoding
+        self._send_buffer[self._position:end_position] = encoded
         self._position += length
+        return self
 
-    def _encode_utf8(self, name):
+    def _put_int(self, data: int):
+        if (data == -sys.maxsize - 1):
+            raise OverflowError
+
+        return self._put_str(str(data))
+
+    def _put_special(self, char: str):
+        if (char == ' ' or char == ',' or char == '='):
+            if (not self._quoted):
+                self._put_str('\\')
+            self._put_str(char)
+        elif (char == '\n' or char == '\r'):
+            self._put_str('\\')._put_str(char)
+        elif (char == '"'):
+            if (self._quoted):
+                self._put_str('\\')
+            self._put_str(char)
+        elif (char == '\\'):
+            self._put_str('\\')._put_str('\\')
+        else:
+            self._put_str(char)
+
+    def _encode_utf8(self, name: str):
         for i in range(len(name)):
             char = ord(name[i])
             if (char < 128):
                 self._put_special(name[i])
             else:
-                self._put_utf8(name[i])
+                self._put_str(name[i])
         return self
 
-    def table(self, name):
+    def table(self, name: str):
         if (self._has_metric):
             raise Exception("Duplicate metric")
 
@@ -111,60 +89,49 @@ class LineTcpSender:
         self._encode_utf8(name)
         return self
 
-    def symbol(self, tag, value):
+    def symbol(self, tag: str, value: str):
         if (self._has_metric and self._no_fields):
-            self._put(',')._encode_utf8(tag)._put('=')._encode_utf8(value)
+            self._put_str(',')._encode_utf8(tag)._put_str('=')._encode_utf8(value)
             return self
 
         raise Exception("Metric expected")
 
-    def column(self, *args):
-        name = args[0]
-        if len(args) == 1:
-            if (self._has_metric):
-                if (self._no_fields):
-                    self._put(' ') 
-                    self._no_fields = False
-                else:
-                    self._put(',')
-                return self._encode_utf8(name)._put('=')
-
-            raise Exception("Metric expected")
-
-        elif len(args) == 2:
-            value = args[1]
-            if isinstance(value, int):
-                self.column(name)._put(value)._put('i')
-                return self
-
-            elif isinstance(value, float):
-                self.column(name)._put(str(value))
-                return self
-
-            elif isinstance(value, str):
-                self.column(name)._put('\"')
-                self._quoted = True
-                self._encode_utf8(value)
-                self._quoted = False
-                self._put('\"')
-                return self
-
+    def column(self, name: str):
+        if (self._has_metric):
+            if (self._no_fields):
+                self._put_str(' ') 
+                self._no_fields = False
             else:
-                raise TypeError("Unsupported type")
+                self._put_str(',')
+            return self._encode_utf8(name)._put_str('=')
+
+        raise Exception("Metric expected")
+
+    def column_int(self, name: str, value: int):
+        self.column(name)._put_int(value)._put_str('i')
+        return self
+
+    def column_float(self, name: str, value: float):
+        self.column(name)._put_str(str(value))
+        return self
+
+    def column_str(self, name: str, value: str):
+        self.column(name)._put_str('\"')
+        self._quoted = True
+        self._encode_utf8(value)
+        self._quoted = False
+        self._put_str('\"')
+        return self
 
     def at_now(self):
-        self._put('\n')
+        self._put_str('\n')
         self._has_metric = False
         self._no_fields = True
 
-    def at(self, time):
-        if isinstance(time, datetime):
-            time_in_s = time.replace(tzinfo=timezone.utc).timestamp()
-            time_in_ns = int(time_in_s * 1e9)
-            self.at(time_in_ns)
+    def at_datetime(self, date_time: datetime):
+        time_in_s = date_time.replace(tzinfo=timezone.utc).timestamp()
+        time_in_ns = int(time_in_s * 1e9)
+        self.at_timestamp(time_in_ns)
 
-        elif isinstance(time, int):
-            self._put(' ')._put(time).at_now()
-
-        else:
-            raise TypeError("Unsupported type")
+    def at_timestamp(self, time_in_ns: int):
+        self._put_str(' ')._put_int(time_in_ns).at_now()
