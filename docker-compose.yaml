@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  questdb:
+    image: questdb/questdb:latest
+    container_name: PETER
+    pull_policy: "always"
+    restart: "always"
+    ports:
+      - "8812:8812"
+      - "9000:9000"
+      - "9009:9009"
+    networks:
+      - saas-network
+
+networks:
+  saas-network:
+    name: saas-network
+    driver: bridge
