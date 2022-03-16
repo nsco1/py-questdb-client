@@ -1,25 +1,24 @@
 import sys
-import socket
+from socket import *
 from datetime import datetime, timezone
 
 
 class LineTcpSender:
-    _client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    _position = 0
-    _has_metric = False
-    _quoted = False
-    _no_fields = True
-
     def __init__(self, address, port, buffer_size=4096):
-        self.address = address
-        self.port = port
-        self.buffer_size = buffer_size
+        self._position = 0
+        self._has_metric = False
+        self._quoted = False
+        self._no_fields = True
 
-        self._client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self._client_socket = socket(AF_INET, SOCK_STREAM)
+        self._client_socket.setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
         self._client_socket.setblocking(True)
         self._client_socket.connect((address, port))
 
         self._send_buffer = bytearray(buffer_size)
+
+    def __del__(self):
+        self._client_socket.close()
 
     def __enter__(self):
         return self
@@ -128,10 +127,13 @@ class LineTcpSender:
         self._has_metric = False
         self._no_fields = True
 
-    def at_datetime(self, date_time: datetime):
+    def at_utc_datetime(self, date_time: datetime):
         time_in_s = date_time.replace(tzinfo=timezone.utc).timestamp()
-        time_in_ns = int(time_in_s * 1e9)
+        time_in_ns = int(int(time_in_s * 10**6) * 10**3)
         self.at_timestamp(time_in_ns)
 
     def at_timestamp(self, time_in_ns: int):
+        if (isinstance(time_in_ns, datetime)):
+            raise TypeError("Must be int, not datetime")
+
         self._put_str(' ')._put_int(time_in_ns).at_now()

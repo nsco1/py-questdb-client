@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "questdb-ilp-client"
+version = "0.0.1"
+description = "A Python API for writing to QuestDB using the InfluxDB Line Protocol"
+authors = ["Nathan Scott <nathan@nathanscott.co.uk>"]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
