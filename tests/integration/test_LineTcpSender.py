@@ -1,18 +1,19 @@
+import socket as skt
 import unittest
-from socket import *
+from datetime import datetime, timedelta, timezone
 from select import select
-from datetime import datetime, timezone, timedelta
-from LineTcpSender import LineTcpSender
+
+from questdb_ilp_client import LineTcpSender
 
 
 class TestLineTcpSender(unittest.TestCase):
-    HOST = ''      # Standard loopback interface address (localhost)
-    PORT = 9009    # Port to listen on (non-privileged ports are > 1023)
-    SIZE = 1024    # Number of bytes to send / receive at one time
+    HOST = ""  # Standard loopback interface address (localhost)
+    PORT = 9009  # Port to listen on (non-privileged ports are > 1023)
+    SIZE = 1024  # Number of bytes to send / receive at one time
 
     def setUp(self):
-        self.client_socket = socket(AF_INET, SOCK_STREAM)
-        self.client_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.client_socket = skt.socket(skt.AF_INET, skt.SOCK_STREAM)
+        self.client_socket.setsockopt(skt.SOL_SOCKET, skt.SO_REUSEADDR, 1)
         self.client_socket.bind((self.HOST, self.PORT))
         self.client_socket.listen()
 
@@ -22,7 +23,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.client_socket.close()
 
     def receive(self):
-        data = b''
+        data = b""
         while True:
             ready = select([self.conn], [], [], 1)
             if ready[0]:
@@ -30,10 +31,12 @@ class TestLineTcpSender(unittest.TestCase):
             else:
                 self.conn.close()
                 break
-        return(repr(data.decode()))
+        return repr(data.decode())
 
     def test_initial(self):
-        expected = repr('metric_name,Symbol=value number=10i,double=12.23,string="born to shine" 1\n')
+        expected = repr(
+            'metric_name,Symbol=value number=10i,double=12.23,string="born to shine" 1\n'
+        )
 
         self.ls.table("metric_name")
         self.ls.symbol("Symbol", "value")
@@ -47,7 +50,9 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_multiple_symbols(self):
-        expected = repr('readings,city=London,make=Omron temperature=23.5,humidity=0.343 1465839830100400000\n')
+        expected = repr(
+            "readings,city=London,make=Omron temperature=23.5,humidity=0.343 1465839830100400000\n"
+        )
 
         self.ls.table("readings")
         self.ls.symbol("city", "London")
@@ -61,7 +66,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_sans_timestamp(self):
-        expected = repr('tracking,loc=north val=200i\n')
+        expected = repr("tracking,loc=north val=200i\n")
 
         self.ls.table("tracking")
         self.ls.symbol("loc", "north")
@@ -73,7 +78,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_datetime_seconds(self):
-        expected = repr('test 1647218817000000000\n')
+        expected = repr("test 1647218817000000000\n")
 
         self.ls.table("test")
         self.ls.at_utc_datetime(datetime(2022, 3, 14, 0, 46, 57))
@@ -83,7 +88,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_datetime_microseconds(self):
-        expected = repr('test 1647218817000123000\n')
+        expected = repr("test 1647218817000123000\n")
 
         self.ls.table("test")
         self.ls.at_utc_datetime(datetime(2022, 3, 14, 0, 46, 57, 123))
@@ -93,7 +98,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_datetime_timezone(self):
-        expected = repr('test 1647263337000000000\n')
+        expected = repr("test 1647263337000000000\n")
         tz = timezone(timedelta(hours=1))
 
         self.ls.table("test")
@@ -104,7 +109,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_timestamp_nanoseconds(self):
-        expected = repr('test 1647218817123456789\n')
+        expected = repr("test 1647218817123456789\n")
 
         self.ls.table("test")
         self.ls.at_timestamp(1647218817123456789)
@@ -126,7 +131,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_many_lines(self):
-        expected = repr('tracking,loc=north val=200i\n' * 1000)
+        expected = repr("tracking,loc=north val=200i\n" * 1000)
 
         for _ in range(1000):
             self.ls.table("tracking")
@@ -139,7 +144,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_table_longer_than_buffer_size(self):
-        expected = repr('tracking,loc=north val=200i\n')
+        expected = repr("tracking,loc=north val=200i\n")
         original_size = self.SIZE
         self.SIZE = 5
 
@@ -157,14 +162,14 @@ class TestLineTcpSender(unittest.TestCase):
         string = "Greetings,"
         string += "Russian=Здравствуйте,"
         string += "Здравствуйте=Reverse "
-        string += "Japanese=\"こんにちは。\","
-        string += "こんにちは。=\"Reverse\","
-        string += "Chinese=\"你好\","
-        string += "你好=\"Reverse\","
-        string += "Arabic=\"أهلا\","
-        string += "أهلا=\"Reverse\","
-        string += "Emoji=\"👋🏻\","
-        string += "👋🏻=\"Reverse\"\n"
+        string += 'Japanese="こんにちは。",'
+        string += 'こんにちは。="Reverse",'
+        string += 'Chinese="你好",'
+        string += '你好="Reverse",'
+        string += 'Arabic="أهلا",'
+        string += 'أهلا="Reverse",'
+        string += 'Emoji="👋🏻",'
+        string += '👋🏻="Reverse"\n'
         expected = repr(string)
 
         self.ls.table("Greetings")
@@ -198,5 +203,6 @@ class TestLineTcpSender(unittest.TestCase):
     def test_column_metric_expected(self):
         self.assertRaises(Exception, self.ls.column, "name")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
