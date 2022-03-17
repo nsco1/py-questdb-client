@@ -1,0 +1,24 @@
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+    - name: install dependencies
+      run: make install-dependencies
+    - name: check format
+      run: make format-code
+    - name: check quality
+      run: make check-code-quality
+    - name: run tests
+      run: make test
