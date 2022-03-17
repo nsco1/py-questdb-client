@@ -17,7 +17,7 @@ class TestLineTcpSender(unittest.TestCase):
         self.client_socket.bind((self.HOST, self.PORT))
         self.client_socket.listen()
 
-        self.ls = LineTcpSender(self.HOST, self.PORT, self.SIZE)
+        self.ls = LineTcpSender.LineTcpSender(self.HOST, self.PORT, self.SIZE)
 
     def tearDown(self):
         self.client_socket.close()
