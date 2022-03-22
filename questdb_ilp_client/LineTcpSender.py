@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 FORBIDDEN_NAME_CHARS = [0, 37, 40, 41, 42, 43, 44, 45, 46, 47, 58, 63, 92, 126, 163]
 
+
 class LineTcpSender:
     def __init__(self, address, port, buffer_size=4096):
         self._position = 0

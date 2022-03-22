@@ -1,5 +1,7 @@
 import unittest
+
 from . import TestLineTcpSender
+
 
 class Main(TestLineTcpSender, unittest.TestCase):
     def invalid_char_helper(self, func, *args):
