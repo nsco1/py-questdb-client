@@ -2,12 +2,14 @@ import socket as skt
 import sys
 from datetime import datetime, timezone
 
+FORBIDDEN_NAME_CHARS = [0, 37, 40, 41, 42, 43, 44, 45, 46, 47, 58, 63, 92, 126, 163]
 
 class LineTcpSender:
     def __init__(self, address, port, buffer_size=4096):
         self._position = 0
         self._has_metric = False
         self._quoted = False
+        self._named = False
         self._no_fields = True
         self._client_socket = skt.socket(skt.AF_INET, skt.SOCK_STREAM)
         self._client_socket.setsockopt(skt.IPPROTO_TCP, skt.TCP_NODELAY, 1)
@@ -68,10 +70,13 @@ class LineTcpSender:
     def _encode_utf8(self, name: str):
         for i in range(len(name)):
             char = ord(name[i])
+            if self._named and char in FORBIDDEN_NAME_CHARS:
+                raise Exception("Invalid char in name")
             if char < 128:
                 self._put_special(name[i])
             else:
                 self._put_str(name[i])
+        self._named = False
         return self
 
     def table(self, name: str):
@@ -80,11 +85,13 @@ class LineTcpSender:
 
         self._quoted = False
         self._has_metric = True
+        self._named = True
         self._encode_utf8(name)
         return self
 
     def symbol(self, tag: str, value: str):
         if self._has_metric and self._no_fields:
+            self._named = True
             return (
                 self._put_str(",")._encode_utf8(tag)._put_str("=")._encode_utf8(value)
             )
@@ -92,6 +99,7 @@ class LineTcpSender:
 
     def column(self, name: str):
         if self._has_metric:
+            self._named = True
             if self._no_fields:
                 self._put_str(" ")
                 self._no_fields = False

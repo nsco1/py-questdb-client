@@ -1,38 +1,9 @@
-import socket as skt
 import unittest
-from datetime import datetime, timedelta, timezone
-from select import select
 
-from questdb_ilp_client import LineTcpSender
+from . import TestLineTcpSender
 
 
-class TestLineTcpSender(unittest.TestCase):
-    HOST = ""  # Standard loopback interface address (localhost)
-    PORT = 9009  # Port to listen on (non-privileged ports are > 1023)
-    SIZE = 1024  # Number of bytes to send / receive at one time
-
-    def setUp(self):
-        self.client_socket = skt.socket(skt.AF_INET, skt.SOCK_STREAM)
-        self.client_socket.setsockopt(skt.SOL_SOCKET, skt.SO_REUSEADDR, 1)
-        self.client_socket.bind((self.HOST, self.PORT))
-        self.client_socket.listen()
-
-        self.ls = LineTcpSender.LineTcpSender(self.HOST, self.PORT, self.SIZE)
-
-    def tearDown(self):
-        self.client_socket.close()
-
-    def receive(self):
-        data = b""
-        while True:
-            ready = select([self.conn], [], [], 1)
-            if ready[0]:
-                data += self.conn.recv(self.SIZE)
-            else:
-                self.conn.close()
-                break
-        return repr(data.decode())
-
+class Main(TestLineTcpSender, unittest.TestCase):
     def test_initial(self):
         expected = repr(
             'metric_name,Symbol=value number=10i,double=12.23,string="born to shine" 1\n'
@@ -65,54 +36,12 @@ class TestLineTcpSender(unittest.TestCase):
         self.conn, self.addr = self.client_socket.accept()
         self.assertEqual(self.receive(), expected)
 
-    def test_sans_timestamp(self):
-        expected = repr("tracking,loc=north val=200i\n")
+    def test_no_symbol(self):
+        expected = repr('table column="test"\n')
 
-        self.ls.table("tracking")
-        self.ls.symbol("loc", "north")
-        self.ls.column_int("val", 200)
+        self.ls.table("table")
+        self.ls.column_str("column", "test")
         self.ls.at_now()
-        self.ls.flush()
-
-        self.conn, self.addr = self.client_socket.accept()
-        self.assertEqual(self.receive(), expected)
-
-    def test_datetime_seconds(self):
-        expected = repr("test 1647218817000000000\n")
-
-        self.ls.table("test")
-        self.ls.at_utc_datetime(datetime(2022, 3, 14, 0, 46, 57))
-        self.ls.flush()
-
-        self.conn, self.addr = self.client_socket.accept()
-        self.assertEqual(self.receive(), expected)
-
-    def test_datetime_microseconds(self):
-        expected = repr("test 1647218817000123000\n")
-
-        self.ls.table("test")
-        self.ls.at_utc_datetime(datetime(2022, 3, 14, 0, 46, 57, 123))
-        self.ls.flush()
-
-        self.conn, self.addr = self.client_socket.accept()
-        self.assertEqual(self.receive(), expected)
-
-    def test_datetime_timezone(self):
-        expected = repr("test 1647263337000000000\n")
-        tz = timezone(timedelta(hours=1))
-
-        self.ls.table("test")
-        self.ls.at_utc_datetime(datetime(2022, 3, 14, 13, 8, 57, tzinfo=tz))
-        self.ls.flush()
-
-        self.conn, self.addr = self.client_socket.accept()
-        self.assertEqual(self.receive(), expected)
-
-    def test_timestamp_nanoseconds(self):
-        expected = repr("test 1647218817123456789\n")
-
-        self.ls.table("test")
-        self.ls.at_timestamp(1647218817123456789)
         self.ls.flush()
 
         self.conn, self.addr = self.client_socket.accept()
@@ -188,10 +117,6 @@ class TestLineTcpSender(unittest.TestCase):
 
         self.conn, self.addr = self.client_socket.accept()
         self.assertEqual(self.receive(), expected)
-
-    def test_timestamp_wrong_value(self):
-        self.ls.table("test")
-        self.assertRaises(TypeError, self.ls.at_timestamp, datetime.now())
 
     def test_duplicate_table(self):
         self.ls.table("table1")
