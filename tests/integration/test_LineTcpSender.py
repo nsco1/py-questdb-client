@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from . import TestLineTcpSender
@@ -59,6 +60,30 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.conn, self.addr = self.client_socket.accept()
         self.assertEqual(self.receive(), expected)
 
+    def test_quoted(self):
+        expected = repr('table,symbol="quoted" column="\\"quoted\\""\n')
+
+        self.ls.table("table")
+        self.ls.symbol("symbol", '"quoted"')
+        self.ls.column_str("column", '"quoted"')
+        self.ls.at_now()
+        self.ls.flush()
+
+        self.conn, self.addr = self.client_socket.accept()
+        self.assertEqual(self.receive(), expected)
+
+    def test_backslash(self):
+        expected = repr('table,symbol=sla\\\\sh column="sla\\\\sh"\n')
+
+        self.ls.table("table")
+        self.ls.symbol("symbol", "sla\\sh")
+        self.ls.column_str("column", "sla\\sh")
+        self.ls.at_now()
+        self.ls.flush()
+
+        self.conn, self.addr = self.client_socket.accept()
+        self.assertEqual(self.receive(), expected)
+
     def test_many_lines(self):
         expected = repr("tracking,loc=north val=200i\n" * 1000)
 
@@ -73,9 +98,12 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.assertEqual(self.receive(), expected)
 
     def test_table_longer_than_buffer_size(self):
-        expected = repr("tracking,loc=north val=200i\n")
+        del self.ls
         original_size = self.SIZE
         self.SIZE = 5
+        self.setUp()
+
+        expected = repr("tracking,loc=north val=200i\n")
 
         self.ls.table("tracking")
         self.ls.symbol("loc", "north")
@@ -83,9 +111,9 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_now()
         self.ls.flush()
 
-        self.SIZE = original_size
         self.conn, self.addr = self.client_socket.accept()
         self.assertEqual(self.receive(), expected)
+        self.SIZE = original_size
 
     def test_foreign_chars(self):
         string = "Greetings,"
@@ -118,6 +146,21 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.conn, self.addr = self.client_socket.accept()
         self.assertEqual(self.receive(), expected)
 
+    def test_ls_as_object(self):
+        expected = repr("tracking,loc=north val=200i\n")
+
+        with self.ls as line_sender:
+            line_sender.table("tracking")
+            line_sender.symbol("loc", "north")
+            line_sender.column_int("val", 200)
+            line_sender.at_now()
+            line_sender.flush()
+
+        self.conn, self.addr = self.client_socket.accept()
+        data = self.conn.recv(self.SIZE)
+        received = repr(data.decode())
+        self.assertEqual(received, expected)
+
     def test_duplicate_table(self):
         self.ls.table("table1")
         self.assertRaises(Exception, self.ls.table, "table2")
@@ -126,7 +169,15 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.assertRaises(Exception, self.ls.symbol, "name", "value")
 
     def test_column_metric_expected(self):
-        self.assertRaises(Exception, self.ls.column, "name")
+        self.assertRaises(Exception, self.ls._column, "name")
+
+    def test_integer_max_size(self):
+        self.ls.table("table")
+        self.assertRaises(Exception, self.ls.column_int, "name", sys.maxsize + 1)
+
+    def test_integer_min_size(self):
+        self.ls.table("table")
+        self.assertRaises(Exception, self.ls.column_int, "name", -sys.maxsize - 2)
 
 
 if __name__ == "__main__":

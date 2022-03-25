@@ -12,19 +12,24 @@ class LineTcpSender:
         self._quoted = False
         self._named = False
         self._no_fields = True
+
         self._client_socket = skt.socket(skt.AF_INET, skt.SOCK_STREAM)
         self._client_socket.setsockopt(skt.IPPROTO_TCP, skt.TCP_NODELAY, 1)
         self._client_socket.setblocking(True)
         self._client_socket.connect((address, port))
+
         self._send_buffer = bytearray(buffer_size)
 
     def __del__(self):
-        self._client_socket.close()
+        self._delete()
 
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
+        self._delete()
+
+    def _delete(self):
         try:
             if self._position > 0:
                 self.flush()
@@ -48,25 +53,18 @@ class LineTcpSender:
         return self
 
     def _put_int(self, data: int):
-        if data == -sys.maxsize - 1:
-            raise OverflowError
+        if data < -sys.maxsize - 1 or data > sys.maxsize:
+            raise Exception("Integer too large or small")
         return self._put_str(str(data))
 
     def _put_special(self, char: str):
-        if char == " " or char == "," or char == "=":
-            if not self._quoted:
-                self._put_str("\\")
-            self._put_str(char)
-        elif char == "\n" or char == "\r":
-            self._put_str("\\")._put_str(char)
-        elif char == '"':
-            if self._quoted:
-                self._put_str("\\")
-            self._put_str(char)
-        elif char == "\\":
-            self._put_str("\\")._put_str("\\")
-        else:
-            self._put_str(char)
+        if (char == " " or char == "," or char == "=") and not self._quoted:
+            self._put_str("\\")
+        elif char == "\n" or char == "\r" or char == "\\":
+            self._put_str("\\")
+        elif char == '"' and self._quoted:
+            self._put_str("\\")
+        self._put_str(char)
 
     def _encode_utf8(self, name: str):
         for i in range(len(name)):
@@ -98,7 +96,7 @@ class LineTcpSender:
             )
         raise Exception("Metric expected")
 
-    def column(self, name: str):
+    def _column(self, name: str):
         if self._has_metric:
             self._named = True
             if self._no_fields:
@@ -111,15 +109,15 @@ class LineTcpSender:
         raise Exception("Metric expected")
 
     def column_int(self, name: str, value: int):
-        self.column(name)._put_int(value)._put_str("i")
+        self._column(name)._put_int(value)._put_str("i")
         return self
 
     def column_float(self, name: str, value: float):
-        self.column(name)._put_str(str(value))
+        self._column(name)._put_str(str(value))
         return self
 
     def column_str(self, name: str, value: str):
-        self.column(name)._put_str('"')
+        self._column(name)._put_str('"')
         self._quoted = True
         self._encode_utf8(value)
         self._quoted = False

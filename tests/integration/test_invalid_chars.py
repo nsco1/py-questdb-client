@@ -113,71 +113,60 @@ class Main(TestLineTcpSender, unittest.TestCase):
 
     def test_invalid_column_name_char1(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ".", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "."))
 
     def test_invalid_column_name_char2(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "?", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "?"))
 
     def test_invalid_column_name_char3(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ",", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, ","))
 
     def test_invalid_column_name_char4(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ":", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, ":"))
 
     def test_invalid_column_name_char5(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "\\", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "\\"))
 
     def test_invalid_column_name_char6(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "/", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "/"))
 
     def test_invalid_column_name_char7(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ")", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, ")"))
 
     def test_invalid_column_name_char8(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "\0", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "\0"))
 
     def test_invalid_column_name_char9(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "(", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "("))
 
     def test_invalid_column_name_char10(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "+", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "+"))
 
     def test_invalid_column_name_char11(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "*", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "*"))
 
     def test_invalid_column_name_char12(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "~", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "~"))
 
     def test_invalid_column_name_char13(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "%", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "%"))
 
     def test_invalid_column_name_char14(self):
         self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "-", ""))
+        self.assertTrue(self.invalid_char_helper(self.ls._column, "-"))
 
-
-"""
-def test_invalid_table_name_char1(self):
-    for val in FORBIDDEN_NAME_CHARS:
-        self.ls._has_metric = False
-        try:
-            self.ls.table(chr(val))
-        except Exception as e:
-            print(f"{chr(val)} = {str(e)}")
-            self.assertEqual(str(e), "Invalid char in name")
-"""
 
 if __name__ == "__main__":
     unittest.main()
