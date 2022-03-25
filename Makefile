@@ -14,6 +14,9 @@ test:
 	$(poetry) run pytest --cov='questdb_ilp_client' --cov-report term-missing
 
 install-dependencies:
+	$(poetry) install --no-dev
+
+install-dependencies-dev:
 	$(poetry) install
 
 format-code:

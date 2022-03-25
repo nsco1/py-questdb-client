@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "questdb_ilp_client"
-version = "0.0.1"
+version = "0.1.0"
 description = "A Python3 API for ingesting data into QuestDB through the InfluxDB Line Protocol."
 authors = ["Nathan Scott <nathan@nathanscott.co.uk>"]
 license = "Apache-2.0"
@@ -8,6 +8,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+
+[tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
 black = "^22.1.0"
 isort = "^5.10.1"
@@ -15,8 +17,6 @@ bandit = "^1.7.4"
 safety = "^1.10.3"
 pytest = "^7.1.0"
 pytest-cov = "^3.0.0"
-
-[tool.poetry.dev-dependencies]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

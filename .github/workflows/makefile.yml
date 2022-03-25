@@ -21,7 +21,7 @@ jobs:
     - name: install poetry
       uses: Gr1N/setup-poetry@v7
     - name: install dependencies
-      run: make install-dependencies
+      run: make install-dependencies-dev
     - name: check format
       run: make format-code
     - name: check quality
