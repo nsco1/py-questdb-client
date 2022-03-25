@@ -5,6 +5,10 @@ description = "A Python3 API for ingesting data into QuestDB through the InfluxD
 authors = ["Nathan Scott <nathan@nathanscott.co.uk>"]
 license = "Apache-2.0"
 readme = "README.md"
+keywords = ["QuestDB", "ILP", "database", "time series"]
+homepage = "https://github.com/nsco1/py-questdb-client"
+repository = "https://github.com/nsco1/py-questdb-client"
+documentation = "https://github.com/nsco1/py-questdb-client/blob/main/README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
