@@ -21,6 +21,17 @@ Now we can install the project's dependencies in a virtual environment and activ
 
 ```shell
 $ make install-dependencies
+```
+
+Or for development (Required for code quality and test flows):
+
+```shell
+$ make install-dependencies-dev
+```
+
+To activate the environment:
+
+```shell
 $ poetry shell
 $ echo $SHLVL
 2
@@ -34,7 +45,7 @@ $ echo $SHLVL
 1
 ```
 
-### Code Quality Flow
+### Code Quality Flow (Requires dev dependencies)
 
 For convenience, we can let standard tools apply standard code formatting; the second command will report
 issues that need to be addressed before using the client in production environments.
@@ -44,9 +55,9 @@ $ make format-code
 $ make check-code-quality
 ```
 
-### Test Flow
+### Test Flow (Requires dev dependencies)
 
-To runs all tests in the `tests` module:
+To run all tests in the `tests` module:
 
 ```shell
 $ make test
