@@ -10,6 +10,9 @@ services:
       - "8812:8812"
       - "9000:9000"
       - "9009:9009"
+    environment:
+      - QDB_LINE_TCP_MAINTENANCE_JOB_INTERVAL=100
+      - QDB_LINE_TCP_MIN_IDLE_MS_BEFORE_WRITER_RELEASE=100
     volumes:
       - ./questdb_root:/root/.questdb
     networks:

@@ -26,5 +26,9 @@ jobs:
       run: make format-code
     - name: check quality
       run: make check-code-quality
+    - name: start docker
+      run: make compose-up
     - name: run tests
       run: make test
+    - name: stop docker
+      run: make compose-down
