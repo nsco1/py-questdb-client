@@ -13,4 +13,5 @@ exclude =
 
 ignore =
     E203,
-    W605
+    W605,
+    B608
