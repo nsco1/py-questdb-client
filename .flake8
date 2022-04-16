@@ -12,6 +12,6 @@ exclude =
     dist
 
 ignore =
+    B608,
     E203,
-    W605,
-    B608
+    W605
