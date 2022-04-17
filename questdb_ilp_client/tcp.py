@@ -2,22 +2,7 @@ import socket as skt
 import sys
 from datetime import datetime, timezone
 
-FORBIDDEN_NAME_CHARS = [
-    0,
-    37,
-    40,
-    41,
-    42,
-    43,
-    44,
-    45,
-    46,
-    47,
-    58,
-    63,
-    92,
-    126
-]
+FORBIDDEN_NAME_CHARS = [0, 37, 40, 41, 42, 43, 44, 45, 46, 47, 58, 63, 92, 126]
 GEOHASH_CHARS = [
     48,
     49,
@@ -50,7 +35,7 @@ GEOHASH_CHARS = [
     119,
     120,
     121,
-    122
+    122,
 ]
 
 

@@ -24,8 +24,6 @@ jobs:
       run: make install-dependencies-dev
     - name: check format
       run: make format-code
-    - name: check quality
-      run: make check-code-quality
     - name: start docker
       run: make compose-up
     - name: run tests
