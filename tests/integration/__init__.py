@@ -11,19 +11,20 @@ class TestLineTcpSender(unittest.TestCase):
     HOST = ""  # Standard loopback interface address (localhost)
     PORT = 9009  # Port to listen on (non-privileged ports are > 1023)
     SIZE = 1024  # Number of bytes to send / receive at one time
+    URL = "http://localhost:9000/exec"  # REST API endpoint
 
     def setUp(self):
         self.ls = LineTcpSender(self.HOST, self.PORT, self.SIZE)
 
     def receive(self, table_name):
-        time.sleep(0.75)
-        params = {"query": f"select * from '{table_name}';"}
-        r = req.get("http://localhost:9000/exec", params)
-        data = json.loads(r.text)
+        received = False
+        while not received:
+            time.sleep(0.1)
+            r = req.get(self.URL, {"query": f"select * from '{table_name}';"})
+            data = json.loads(r.text)
 
-        time.sleep(0.75)
-        params = {"query": f"drop table '{table_name}';"}
-        req.get("http://localhost:9000/exec", params)
+            if data["count"] > 0:
+                received = True
 
-        expected = (data["columns"], data["dataset"])
-        return expected
+        req.get(self.URL, {"query": f"drop table '{table_name}';"})
+        return (data["columns"], data["dataset"])
