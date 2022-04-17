@@ -19,20 +19,14 @@ class TestLineTcpSender(unittest.TestCase):
     def receive(self, table_name):
         received = False
         while not received:
-            time.sleep(0.1)
+            time.sleep(0.25)
             r = req.get(
                 url=self.URL, params={"query": f"select * from '{table_name}';"}
             )
             data = json.loads(r.text)
-
-            try:
-                if data["count"] > 0:
-                    req.get(
-                        url=self.URL, params={"query": f"drop table '{table_name}';"}
-                    )
-                    received = True
-            except KeyError:
-                print(data)
-                pass
+            print(data)
+            if data["count"] > 0:
+                req.get(url=self.URL, params={"query": f"drop table '{table_name}';"})
+                received = True
 
         return (data["columns"], data["dataset"])
