@@ -20,11 +20,11 @@ class TestLineTcpSender(unittest.TestCase):
         received = False
         while not received:
             time.sleep(0.1)
-            r = req.get(self.URL, {"query": f"select * from '{table_name}';"})
+            r = req.get(self.URL+f"?query=select+%2A+from+%27{table_name}%27%3B")
             data = json.loads(r.text)
 
             if data["count"] > 0:
+                req.get(self.URL+f"?query=drop+table+%27{table_name}%27%3B")
                 received = True
 
-        req.get(self.URL, {"query": f"drop table '{table_name}';"})
         return (data["columns"], data["dataset"])
