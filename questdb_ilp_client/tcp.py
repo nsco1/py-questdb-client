@@ -75,6 +75,7 @@ class LineTcpSender:
 
     def flush(self):
         sent = self._client_socket.send(self._send_buffer[: self._position])
+        print(self._send_buffer[: self._position])
         self._position -= sent
 
     def _put_str(self, data: str):
