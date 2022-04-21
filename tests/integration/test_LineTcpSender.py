@@ -106,7 +106,6 @@ class Main(TestLineTcpSender, unittest.TestCase):
 
     def test_backslash(self):
         expected_columns = [
-            {"name": "symbol", "type": "SYMBOL"},
             {"name": "column", "type": "STRING"},
             {"name": "timestamp", "type": "TIMESTAMP"},
         ]
@@ -115,7 +114,6 @@ class Main(TestLineTcpSender, unittest.TestCase):
         table_name = "test_backslash"
 
         self.ls.table(table_name)
-        self.ls.symbol("symbol", "sla\\sh")
         self.ls.column_str("column", "sla\\sh")
         self.ls.at_timestamp(1649348248000000000)
         self.ls.flush()
