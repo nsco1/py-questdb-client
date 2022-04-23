@@ -1,10 +1,9 @@
-import unittest
 from datetime import datetime, timedelta, timezone
 
-from . import TestLineTcpSender
+from . import TestLineTcpSender, select_all_from
 
 
-class Main(TestLineTcpSender, unittest.TestCase):
+class TimestampsTest(TestLineTcpSender):
     def test_sans_timestamp(self):
         expected_columns = [
             {"name": "loc", "type": "SYMBOL"},
@@ -21,7 +20,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_now()
         self.ls.flush()
 
-        received_columns, received_dataset = self.receive(table_name)
+        received_columns, received_dataset = select_all_from(table_name)
         received = (received_columns, received_dataset[0][:2])
         self.assertEqual(received, expected)
 
@@ -41,7 +40,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_utc_datetime(datetime(2022, 3, 14, 0, 46, 57))
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_datetime_microseconds(self):
         expected_columns = [
@@ -59,7 +58,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_utc_datetime(datetime(2022, 3, 14, 0, 46, 57, 123))
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_datetime_timezone(self):
         expected_columns = [
@@ -78,7 +77,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_utc_datetime(datetime(2022, 3, 14, 13, 8, 57, tzinfo=tz))
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_early_datetime(self):
         expected_columns = [
@@ -96,8 +95,4 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_utc_datetime(datetime(1970, 1, 1, 0, 0, 1))
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        self.assertEqual(select_all_from(table_name), expected)

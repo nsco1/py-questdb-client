@@ -10,7 +10,7 @@ poetry ?= poetry
 docker ?= docker
 make   ?= make
 
-test:
+test: check-code-quality
 	$(poetry) run pytest --cov='questdb_ilp_client' --cov-report term-missing
 
 install-dependencies:
