@@ -1,163 +1,79 @@
-import unittest
+from typing import Optional
 
-from . import TestLineTcpSender
-
-
-class Main(TestLineTcpSender, unittest.TestCase):
-    def test_invalid_table_name_char1(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "."))
-
-    def test_invalid_table_name_char2(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "?"))
-
-    def test_invalid_table_name_char3(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, ","))
-
-    def test_invalid_table_name_char4(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, ":"))
-
-    def test_invalid_table_name_char5(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "\\"))
-
-    def test_invalid_table_name_char6(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "/"))
-
-    def test_invalid_table_name_char7(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, ")"))
-
-    def test_invalid_table_name_char8(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "\0"))
-
-    def test_invalid_table_name_char9(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "("))
-
-    def test_invalid_table_name_char10(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "+"))
-
-    def test_invalid_table_name_char11(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "*"))
-
-    def test_invalid_table_name_char12(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "~"))
-
-    def test_invalid_table_name_char13(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "%"))
-
-    def test_invalid_table_name_char14(self):
-        self.assertTrue(self.invalid_char_helper(self.ls.table, "-"))
-
-    def test_invalid_symbol_name_char1(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, ".", ""))
-
-    def test_invalid_symbol_name_char2(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "?", ""))
-
-    def test_invalid_symbol_name_char3(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, ",", ""))
-
-    def test_invalid_symbol_name_char4(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, ":", ""))
-
-    def test_invalid_symbol_name_char5(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "\\", ""))
-
-    def test_invalid_symbol_name_char6(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "/", ""))
-
-    def test_invalid_symbol_name_char7(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, ")", ""))
-
-    def test_invalid_symbol_name_char8(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "\0", ""))
-
-    def test_invalid_symbol_name_char9(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "(", ""))
-
-    def test_invalid_symbol_name_char10(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "+", ""))
-
-    def test_invalid_symbol_name_char11(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "*", ""))
-
-    def test_invalid_symbol_name_char12(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "~", ""))
-
-    def test_invalid_symbol_name_char13(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "%", ""))
-
-    def test_invalid_symbol_name_char14(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.symbol, "-", ""))
-
-    def test_invalid_column_name_char1(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ".", ""))
-
-    def test_invalid_column_name_char2(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "?", ""))
-
-    def test_invalid_column_name_char3(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ",", ""))
-
-    def test_invalid_column_name_char4(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ":", ""))
-
-    def test_invalid_column_name_char5(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "\\", ""))
-
-    def test_invalid_column_name_char6(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "/", ""))
-
-    def test_invalid_column_name_char7(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, ")", ""))
-
-    def test_invalid_column_name_char8(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "\0", ""))
-
-    def test_invalid_column_name_char9(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "(", ""))
-
-    def test_invalid_column_name_char10(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "+", ""))
-
-    def test_invalid_column_name_char11(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "*", ""))
-
-    def test_invalid_column_name_char12(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "~", ""))
-
-    def test_invalid_column_name_char13(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "%", ""))
-
-    def test_invalid_column_name_char14(self):
-        self.ls.table("test")
-        self.assertTrue(self.invalid_char_helper(self.ls.column_str, "-", ""))
+from questdb_ilp_client.tcp import LineTcpSender
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_invalid_table_name_chars():
+    ls = LineTcpSender("localhost", 9009, 1024)
+    expect_fail_invalid_char(ls, "table", ".")
+    expect_fail_invalid_char(ls, "table", "?")
+    expect_fail_invalid_char(ls, "table", ",")
+    expect_fail_invalid_char(ls, "table", ":")
+    expect_fail_invalid_char(ls, "table", "\\")
+    expect_fail_invalid_char(ls, "table", "/")
+    expect_fail_invalid_char(ls, "table", ")")
+    expect_fail_invalid_char(ls, "table", "\0")
+    expect_fail_invalid_char(ls, "table", "(")
+    expect_fail_invalid_char(ls, "table", "+")
+    expect_fail_invalid_char(ls, "table", "*")
+    expect_fail_invalid_char(ls, "table", "~")
+    expect_fail_invalid_char(ls, "table", "%")
+    expect_fail_invalid_char(ls, "table", "-")
+
+
+def test_invalid_symbol_name_chars():
+    ls = LineTcpSender("localhost", 9009, 1024)
+    expect_fail_invalid_char(ls, "symbol", ".", "test")
+    expect_fail_invalid_char(ls, "symbol", "?", "test")
+    expect_fail_invalid_char(ls, "symbol", ",", "test")
+    expect_fail_invalid_char(ls, "symbol", ":", "test")
+    expect_fail_invalid_char(ls, "symbol", "\\", "test")
+    expect_fail_invalid_char(ls, "symbol", "/", "test")
+    expect_fail_invalid_char(ls, "symbol", ")", "test")
+    expect_fail_invalid_char(ls, "symbol", "\0", "test")
+    expect_fail_invalid_char(ls, "symbol", "(", "test")
+    expect_fail_invalid_char(ls, "symbol", "+", "test")
+    expect_fail_invalid_char(ls, "symbol", "*", "test")
+    expect_fail_invalid_char(ls, "symbol", "~", "test")
+    expect_fail_invalid_char(ls, "symbol", "%", "test")
+    expect_fail_invalid_char(ls, "symbol", "-", "test")
+
+
+def test_invalid_column_name_chars():
+    ls = LineTcpSender("localhost", 9009, 1024)
+    expect_fail_invalid_char(ls, "column_str", ".", "test")
+    expect_fail_invalid_char(ls, "column_str", "?", "test")
+    expect_fail_invalid_char(ls, "column_str", ",", "test")
+    expect_fail_invalid_char(ls, "column_str", ":", "test")
+    expect_fail_invalid_char(ls, "column_str", "\\", "test")
+    expect_fail_invalid_char(ls, "column_str", "/", "test")
+    expect_fail_invalid_char(ls, "column_str", ")", "test")
+    expect_fail_invalid_char(ls, "column_str", "\0", "test")
+    expect_fail_invalid_char(ls, "column_str", "(", "test")
+    expect_fail_invalid_char(ls, "column_str", "+", "test")
+    expect_fail_invalid_char(ls, "column_str", "*", "test")
+    expect_fail_invalid_char(ls, "column_str", "~", "test")
+    expect_fail_invalid_char(ls, "column_str", "%", "test")
+    expect_fail_invalid_char(ls, "column_str", "-", "test")
+
+
+def expect_fail_invalid_char(
+    ls: LineTcpSender,
+    method: str,
+    arg: str,
+    table_name: Optional[str] = None,
+):
+    try:
+        ls.reset()
+        if table_name:
+            ls.table(table_name)
+        if method == "table":
+            ls.table(arg)
+        elif method == "symbol":
+            ls.symbol(arg, "")
+        elif method == "column_str":
+            ls.column_str(arg, "")
+        raise AssertionError()
+    except ValueError as err:
+        if str(err) != "Invalid char in name":
+            raise AssertionError()

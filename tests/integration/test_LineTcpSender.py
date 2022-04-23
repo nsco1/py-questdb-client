@@ -1,9 +1,7 @@
-import unittest
-
-from . import TestLineTcpSender
+from . import TestLineTcpSender, select_all_from
 
 
-class Main(TestLineTcpSender, unittest.TestCase):
+class LineTcpSenderTest(TestLineTcpSender):
     def test_initial(self):
         expected_columns = [
             {"name": "Symbol", "type": "SYMBOL"},
@@ -26,7 +24,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1000)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_multiple_symbols(self):
         expected_columns = [
@@ -50,7 +48,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1465839830100400000)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_no_symbol(self):
         expected_columns = [
@@ -66,7 +64,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1649345988774345984)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_spaces(self):
         expected_columns = [
@@ -84,7 +82,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1649345988774345984)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_quoted(self):
         expected_columns = [
@@ -102,7 +100,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1649345988774345984)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_many_lines(self):
         expected_columns = [
@@ -121,11 +119,11 @@ class Main(TestLineTcpSender, unittest.TestCase):
             self.ls.at_timestamp(1649348248000000000)
             self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_table_longer_than_buffer_size(self):
         del self.ls
-        original_size = self.SIZE
+        original_size = self.buffer_size
         self.SIZE = 5
         self.setUp()
 
@@ -144,7 +142,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1346021301000000000)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
         self.SIZE = original_size
 
     def test_foreign_chars(self):
@@ -193,7 +191,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1346021301000000000)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_ls_as_object(self):
         expected_columns = [
@@ -212,7 +210,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
             line_sender.at_timestamp(1649344280159604000)
             line_sender.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_long(self):
         expected_columns = [
@@ -228,7 +226,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1638202821000000000)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_geohash(self):
         expected_columns = [
@@ -244,7 +242,7 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1638202821000000000)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
+        self.assertEqual(select_all_from(table_name), expected)
 
     def test_bool(self):
         expected_columns = [
@@ -260,8 +258,4 @@ class Main(TestLineTcpSender, unittest.TestCase):
         self.ls.at_timestamp(1649345988774345984)
         self.ls.flush()
 
-        self.assertEqual(self.receive(table_name), expected)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        self.assertEqual(select_all_from(table_name), expected)
