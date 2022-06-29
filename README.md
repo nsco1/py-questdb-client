@@ -97,7 +97,7 @@ Data are available, even when QuestDB is down, in folder `questdb_root`.
 ## Basic usage
 
 ```python
-import datetime
+from datetime import datetime
 from questdb_ilp_client.tcp import LineTcpSender
 
 # Single line send
